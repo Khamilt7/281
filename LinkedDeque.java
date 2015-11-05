@@ -1,31 +1,50 @@
 public class LinkedDeque {      
-    Node firstnode; 
+    Node firstnode;
     Node lastnode;
     int size = 0;
     public LinkedDeque () {
-        
-    }
-    
+        this.firstnode = null;
+        this.lastnode = this.firstnode;
+    }   
     public void insertLeft ( Object o ) {
-        firstnode = new Node(o, null, firstnode);
+        if(size == 0) {
+            firstnode = new Node(o);
+            lastnode = firstnode;
+        } else {
+            firstnode = new Node(o,  null, firstnode);
+            firstnode.right.left = firstnode;
+        }
         size++;
     }
     
     public void insertRight ( Object o ) {
-        lastnode = new Node(o,lastnode, null);
+        if(size == 0) {
+            lastnode = new Node(o);
+            firstnode = lastnode;
+        } else {
+            lastnode = new Node(o, lastnode, null);
+            lastnode.left.right = lastnode;
+        }       
         size++;
     }
     
     public void deleteLeft () {
+        if(size == 0) {
+            throw new IllegalArgumentException();
+        }
         firstnode = firstnode.right;
-        firstnode.left = null;
+        firstnode.setLeft(null);
         size--;
     }
     
     public void deleteRight () {
-        lastnode = lastnode.left;
-        lastnode.right = null;
-        size--;
+        if(size == 0) {
+            throw new IllegalArgumentException();
+        } else {
+            lastnode = lastnode.left;
+            lastnode.setRight(null); 
+                    size--;
+        }
     }
     
     public Object left () {
@@ -62,8 +81,8 @@ public class LinkedDeque {
         LinkedDeque testDeque = new LinkedDeque();
         testDeque.insertLeft("dog");
         testDeque.insertLeft("cat");
-        //testDeque.insertRight("dogcat");
-        //testDeque.insertRight("catdog");
+        testDeque.insertRight("dogcat");
+        testDeque.insertRight("catdog");
         System.out.println("Testing Constructor");
         try {
             displaySuccessIfTrue(emptyDeck.size == 0);         
@@ -71,7 +90,7 @@ public class LinkedDeque {
             displaySuccessIfTrue(false);
         }
         try {
-            displaySuccessIfTrue(testDeque.size == 2);         
+            displaySuccessIfTrue(testDeque.size == 4);         
         } catch (Exception e) {
             displaySuccessIfTrue(false);
         }        
@@ -125,7 +144,7 @@ public class LinkedDeque {
             displaySuccessIfTrue(false);
         } 
         try {
-            displaySuccessIfTrue(sixDeck.toString().equals("[last][middle][first]"));  
+            displaySuccessIfTrue(sixDeck.toString().equals("[first][middle][last]")); 
         } catch (Exception e) {
             displaySuccessIfTrue(false);
         }      
@@ -152,7 +171,13 @@ public class LinkedDeque {
             displaySuccessIfTrue(fourDeck.left() == "lizard");  
         } catch (Exception e) {
             displaySuccessIfTrue(false);
-        }   
+        } 
+        try {
+            emptyDeck.deleteLeft();
+            displaySuccessIfTrue(false);  
+        } catch (Exception e) {
+            displaySuccessIfTrue(true);
+        }          
         System.out.println("Testing deleteRight");
         threeDeck.deleteRight();
         try {
@@ -166,6 +191,12 @@ public class LinkedDeque {
         } catch (Exception e) {
             displaySuccessIfTrue(false);
         }
+        try {
+            emptyDeck.deleteRight();
+            displaySuccessIfTrue(false);  
+        } catch (Exception e) {
+            displaySuccessIfTrue(true);
+        }    
         System.out.println("Testing left");
         LinkedDeque leftDeck = new LinkedDeque();
         leftDeck.insertLeft("cat");
@@ -203,7 +234,7 @@ public class LinkedDeque {
             displaySuccessIfTrue(false);
         }
         try {
-            displaySuccessIfTrue(testDeque.size == 1);         
+            displaySuccessIfTrue(testDeque.size == 3);         
         } catch (Exception e) {
             displaySuccessIfTrue(false);
         }        
@@ -219,8 +250,7 @@ public class LinkedDeque {
         }         
         System.out.println("Testing toString");
         try {
-            displaySuccessIfTrue(rightDeck.toString() == "[cat][kitten][mothercat]"); 
-                System.out.println(rightDeck.toString());
+            displaySuccessIfTrue(rightDeck.toString().equals("[cat][kitten][mothercat]")); 
         } catch (Exception e) {
             displaySuccessIfTrue(false);
         }  
@@ -233,8 +263,8 @@ public class LinkedDeque {
     }
     class Node {
         Object information;
-        Node left;
-        Node right;      
+        Node left = null;
+        Node right = null;      
     
     public Node(Object information) {
         this.information = information;
@@ -243,12 +273,12 @@ public class LinkedDeque {
         this.left = left;
         this.right = right;
         this.information = information;
-        if(left != null) {
-            left.right = this; 
-        }
-        if(right != null) {
-            right.left = this;
-        }
+    } 
+    public void setLeft(Node leftnode) {
+       this.left = leftnode;
+    }
+    public void setRight(Node rightnode) {
+        this.right = rightnode;
     }
     public String toString(String str) {
         str += "[" + information + "]";
